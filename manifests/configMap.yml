@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jarvis-config
+data:
+  rds_endpoint: rds_placeholder
+  redis_endpoint: redis_placeholder
+  webengage_base_uri: webengage_placeholder

@@ -1,0 +1,5 @@
+---
+startDelaySeconds: 0
+remote_write:
+  - url: https://metric-api.eu.newrelic.com/prometheus/v1/write?prometheus_server=jarvis
+    bearer_token: eu01xx1914c49245b4f81515b84ba854a2e3NRAL

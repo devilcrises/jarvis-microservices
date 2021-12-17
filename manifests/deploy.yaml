@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jarvis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jarvis
+  template:
+    metadata:
+      annotations:
+        eks.amazonaws.com/compute-type: fargate
+      labels:
+        app: jarvis
+    spec:
+      containers:
+        - name: jarvis
+          image: 579480199555.dkr.ecr.ap-south-1.amazonaws.com/jarvis-k2cloud:latest
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /heartbeat
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            successThreshold: 1
+            timeoutSeconds: 5
+          livenessprobe:
+            failureThreshold: 3
+            httpGet:
+              path: /heartbeat
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            successThreshold: 1
+            timeoutSeconds: 5
+          env:
+            - name: mysql.datasource.username
+              valueFrom:
+                secretKeyRef:
+                  name: jarvis-secret-config
+                  key: username
+            - name: mysql.datasource.password
+              valueFrom:
+                secretKeyRef:
+                  name: jarvis-secret-config
+                  key: password
+            - name: stream_api_secret
+              valueFrom:
+                secretKeyRef:
+                  name: jarvis-secret-config
+                  key: stream_api_secret
+            - name: webengage_api_key
+              valueFrom:
+                secretKeyRef:
+                  name: jarvis-secret-config
+                  key: webengage_api_key
+            - name: webengage_base_uri
+              valueFrom:
+                configMapKeyRef:
+                  name: jarvis-config
+                  key: webengage_base_uri
+            - name: mysql.datasource.url
+              valueFrom:
+                configMapKeyRef:
+                  name: jarvis-config
+                  key: rds_endpoint
+            - name: redis_endpoint
+              valueFrom:
+                configMapKeyRef:
+                  name: jarvis-config
+                  key: redis_endpoint

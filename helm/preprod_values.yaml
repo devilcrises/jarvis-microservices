@@ -1,0 +1,98 @@
+# Default values for jarvis.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+namespace: default
+
+deployment:
+  serviceAccountName: jarvis-envoy
+  name: jarvis
+  replicaCount: 2
+  minReadySeconds: 100
+  image:
+    repo: 579480199555.dkr.ecr.ap-south-1.amazonaws.com/jarvis
+    tag: 'latest'
+    pullPolicy: Always
+  port: 8080
+  healthPath: /heartbeat
+  initialDelay: 100
+  liveness:
+    period: 80
+    timeout: 5
+    successThreshold: 1
+    failureThreshold: 2
+  readiness:
+    period: 80
+    timeout: 5
+    successThreshold: 1
+    failureThreshold: 2
+  shutdownTime: 60
+  limits:
+    memory: 1G
+    cpu: 2000m
+  requests: 
+    cpu: 2000m
+    memory: 500M
+
+service:
+  name: jarvis-service
+  mysql: aurora-cluster-threedots-instance.cohgn7ym7gy1.ap-south-1.rds.amazonaws.com
+  redis: elasticache-redis-k2cloud.oqjqgm.ng.0001.aps1.cache.amazonaws.com
+  portName: java
+  port: 8080
+  protocol: TCP
+  
+configMap:
+  name: jarvis-config
+  webengage_base_uri: https://api.in.webengage.com/
+  vault_base_uri: https://stg.api.threedots.app
+  vision_base_uri: https://stg.api.threedots.app
+  valkyrie_base_uri: https://stg.api.threedots.app
+  bifrost_base_uri: https://stg.api.threedots.app
+  log_path: /var/log/jarvis/debug.log
+  service: jarvis-service
+
+secrets:
+  name: jarvis-secret-config
+  mysql_datasource_username: cm9vdA==
+  mysql_datasource_password: dGhyZWVkb3RzMTIzNA==
+  stream_api_secret: aDR6M2d1eWgzZGJlNHVoNWpuZnpqZnlzejdnNDR4cXhiemt5aHQzOHlobmo2Z252eWs1eWM2aGtuN3pwNHR0cA==
+  webengage_api_key: ZTAyYzVlNjItODI0YS00ODAzLWFmYjctNGM3YjhkMzg0MTFj
+  vault_token: RTYzM0YxMzAtNDU0MC02MUZELUMyRjktOTNBNEI3RDgxMzZE
+  vision_token: MkFEMTM0NzgtRjQxMC00OUJDLTk5MjgtREQwMDU4QUEwMzcw
+  valkyrie_token: MkFEMTM0NzgtRjQxMC00OUJDLTk5MjgtREQwMDU4QUEwMzcw
+  bifrost_token: NGRhYmVmZTEtNjQ4MC00YTkyLTk3OGItOGU3MjExYWZjYTVl
+
+disruptionBudget:
+  name: jarvis-pdb
+  minAvailable: 1
+
+newrelic:
+  name: newrelic
+  cluster_name: eks-clusterthreedots-k2
+  limits:
+    memory: 100M 
+    cpu: 200m
+  requests: 
+    cpu: 100m
+    memory: 50M
+
+fluentd_configMap:
+  name: jarvis-tdagentconf-config
+
+fluentd:
+  name: fluentd
+  mountPath: /var/log/jarvis/
+
+virtualnode:
+  name: jarvis-node
+  podSelector:
+    matchLabels:
+      app: jarvis
+  serviceDiscovery:
+    dns:
+      hostname: jarvis-service.default.svc.cluster.local
+
+virtualservice:
+  name: jarvis-virtual-service
+  awsName: jarvis-virtual-service.default.svc.cluster.local

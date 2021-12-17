@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.fluentd_configMap.name }}
+  namespace: {{ .Values.namespace }}
+data:
+  td-agent.conf: |
+    <source>
+      @type tail
+      <parse>
+        @type none
+      </parse>
+      path "#{ENV['log_path']}"
+      tag "#{ENV['service']}"
+    </source>
+
+    <filter "#{ENV['service']}">
+      @type record_transformer
+      <record>
+        service_name "#{ENV['service']}"
+        hostname "#{Socket.gethostname}"
+      </record>
+    </filter>
+
+    <match **>
+      @type newrelic
+      api_key "#{ENV['api_key']}"
+      base_uri https://log-api.eu.newrelic.com/log/v1
+    </match>

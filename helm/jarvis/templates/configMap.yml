@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.configMap.name }}
+  namespace: {{ .Values.namespace }}
+data:
+  webengage_base_uri: {{ .Values.configMap.webengage_base_uri }}
+  vault_base_uri: {{ .Values.configMap.vault_base_uri }}
+  vision_base_uri: {{ .Values.configMap.vision_base_uri }}
+  valkyrie_base_uri: {{ .Values.configMap.valkyrie_base_uri }}
+  bifrost_base_uri: {{ .Values.configMap.bifrost_base_uri }}
+  log_path: {{ .Values.configMap.log_path}}
+  service: {{ .Values.configMap.service}}

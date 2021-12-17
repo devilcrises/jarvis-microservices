@@ -1,0 +1,16 @@
+apiVersion: appmesh.k8s.aws/v1beta2
+kind: VirtualNode
+metadata:
+  name: {{ .Values.virtualnode.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ .Values.virtualnode.podSelector.matchLabels.app }}
+  listeners:
+    - portMapping:
+        port: 8080
+        protocol: tcp
+  serviceDiscovery:
+    dns:
+      hostname: {{ .Values.virtualnode.serviceDiscovery.dns.hostname }}
